@@ -1,8 +1,20 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { MorganInterceptor, MorganModule } from 'nest-morgan';
+import { typeORMConfig } from './common/config/ormconfig';
+import { SuggestModule } from './suggest/suggest.module';
 
 @Module({
-  imports: [],
+  imports: [
+    TypeOrmModule.forRootAsync(typeORMConfig),
+    MorganModule,
+    SuggestModule,
+  ],
   controllers: [],
-  providers: [],
+  providers: [
+    Logger,
+    { provide: APP_INTERCEPTOR, useClass: MorganInterceptor('dev') },
+  ],
 })
 export class AppModule {}
