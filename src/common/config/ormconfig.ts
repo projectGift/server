@@ -8,6 +8,7 @@ export const typeORMConfig: TypeOrmModuleAsyncOptions = {
   useFactory: (configService: ConfigService) => ({
     type: 'mysql',
     url: configService.get('DB_URL'),
+    username: configService.get('DB_USERNAME'),
     host: configService.get('DB_HOST'),
     password: configService.get('DB_PASSWORD'),
     entities: [],
