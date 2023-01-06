@@ -4,12 +4,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MorganInterceptor, MorganModule } from 'nest-morgan';
 import { typeORMConfig } from './common/config/ormconfig';
 import { SuggestModule } from './suggest/suggest.module';
+import { DataImportModule } from './data-import/data-import.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync(typeORMConfig),
     MorganModule,
     SuggestModule,
+    DataImportModule,
   ],
   controllers: [],
   providers: [
