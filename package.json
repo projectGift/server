@@ -31,10 +31,12 @@
     "dotenv": "^16.0.3",
     "mysql2": "^2.3.3",
     "nest-morgan": "^2.0.0",
+    "read-excel-file": "^5.5.3",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
-    "typeorm": "^0.3.11"
+    "typeorm": "^0.3.11",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
