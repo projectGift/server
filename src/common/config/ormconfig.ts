@@ -10,6 +10,16 @@ import { PersonalityListEntity } from 'src/data-import/entities/personality_list
 import { RelationListEntity } from 'src/data-import/entities/relation_lists.entity';
 import { SeasonListEntity } from 'src/data-import/entities/season_lists.entity';
 import { TimeListEntity } from 'src/data-import/entities/time_lists.entity';
+import { ProductsEntity } from '../../data-import/entities/products.entity';
+import { ProductsGenderListsEntity } from 'src/data-import/entities/products_gender_lists.entity';
+import { ProductsEventListsEntity } from 'src/data-import/entities/products_event_lists.entity';
+import { ProductsAgeListsEntity } from 'src/data-import/entities/products_age_lists.entity';
+import { ProductsHobbyListsEntity } from 'src/data-import/entities/products_hobby_lists.entity';
+import { ProductsMbtiListsEntity } from 'src/data-import/entities/products_mbti_lists.entity';
+import { ProductsPersonalityListsEntity } from 'src/data-import/entities/products_personality.entity';
+import { ProductsRelationListsEntity } from 'src/data-import/entities/products_relation_lists.entity';
+import { ProductsSeasonListsEntity } from 'src/data-import/entities/products_season_lists.entity';
+import { ProductsTimeListsEntity } from 'src/data-import/entities/products_time_lists.entity';
 
 export const typeORMConfig: TypeOrmModuleAsyncOptions = {
   imports: [ConfigModule],
@@ -31,6 +41,16 @@ export const typeORMConfig: TypeOrmModuleAsyncOptions = {
       RelationListEntity,
       SeasonListEntity,
       TimeListEntity,
+      ProductsEntity,
+      ProductsGenderListsEntity,
+      ProductsEventListsEntity,
+      ProductsAgeListsEntity,
+      ProductsHobbyListsEntity,
+      ProductsMbtiListsEntity,
+      ProductsPersonalityListsEntity,
+      ProductsRelationListsEntity,
+      ProductsSeasonListsEntity,
+      ProductsTimeListsEntity,
     ],
     synchronize: false,
   }),
