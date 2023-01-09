@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import * as xlsx from 'xlsx';
 import { AgeListEntity } from './entities/age_lists.entity';
 import { EventListEntity } from './entities/event_lists.entity';
@@ -20,10 +20,15 @@ import { ProductsPersonalityListsEntity } from './entities/products_personality.
 import { ProductsRelationListsEntity } from './entities/products_relation_lists.entity';
 import { ProductsSeasonListsEntity } from './entities/products_season_lists.entity';
 import { ProductsTimeListsEntity } from './entities/products_time_lists.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class DataImportService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    @InjectRepository(ProductsEntity)
+    private readonly productsRepository: Repository<ProductsEntity>,
+  ) {}
   async importCsvDataInDatabase(file) {
     const workbook = xlsx.read(file.buffer, { type: 'buffer' });
 
@@ -729,7 +734,6 @@ export class DataImportService {
       await queryRunner.release();
 
       console.error(error);
-      // return new HttpException(error.messsage, error.statusCode);
     }
   }
 }
