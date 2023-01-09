@@ -26,7 +26,7 @@ export const typeORMConfig: TypeOrmModuleAsyncOptions = {
   inject: [ConfigService],
   useFactory: (configService: ConfigService) => ({
     type: 'mysql',
-    url: configService.get('DB_URL'),
+    url: configService.get('DATABASE_URL'),
     username: configService.get('DB_USERNAME'),
     host: configService.get('DB_HOST'),
     database: configService.get('DB_NAME'),
