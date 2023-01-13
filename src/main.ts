@@ -4,12 +4,14 @@ import * as dotenv from 'dotenv';
 import { HttpExceptionFilter } from './common/Exceptions/httpExceptionFilter';
 import { OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import { config } from './common/config/swaggerconfig';
+import { ValidationPipe } from '@nestjs/common';
 dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
   app.enableCors();
+  app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const documentation: OpenAPIObject = SwaggerModule.createDocument(

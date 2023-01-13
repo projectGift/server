@@ -5,6 +5,7 @@ import { MorganInterceptor, MorganModule } from 'nest-morgan';
 import { typeORMConfig } from './common/config/ormconfig';
 import { SuggestModule } from './suggest/suggest.module';
 import { DataImportModule } from './data-import/data-import.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { DataImportModule } from './data-import/data-import.module';
     MorganModule,
     SuggestModule,
     DataImportModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [

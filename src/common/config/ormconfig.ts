@@ -20,6 +20,7 @@ import { ProductsPersonalityListsEntity } from 'src/data-import/entities/product
 import { ProductsRelationListsEntity } from 'src/data-import/entities/products_relation_lists.entity';
 import { ProductsSeasonListsEntity } from 'src/data-import/entities/products_season_lists.entity';
 import { ProductsTimeListsEntity } from 'src/data-import/entities/products_time_lists.entity';
+import { UsersEntity } from './../../users/users.entity';
 
 export const typeORMConfig: TypeOrmModuleAsyncOptions = {
   imports: [ConfigModule],
@@ -51,6 +52,7 @@ export const typeORMConfig: TypeOrmModuleAsyncOptions = {
       ProductsRelationListsEntity,
       ProductsSeasonListsEntity,
       ProductsTimeListsEntity,
+      UsersEntity,
     ],
     synchronize: false,
   }),
