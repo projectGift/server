@@ -1,4 +1,4 @@
-import { UsersEntity } from './users.entity';
+import { UsersEntity } from './entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';

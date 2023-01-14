@@ -1,6 +1,6 @@
 import { UsersRepository } from './users.repository';
 import { RequestUserDto } from './dto/users.request.dto';
-import { UsersEntity } from './users.entity';
+import { UsersEntity } from './entities/users.entity';
 import {
   Injectable,
   NotFoundException,

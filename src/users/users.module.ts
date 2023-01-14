@@ -1,5 +1,5 @@
 import { UsersRepository } from './users.repository';
-import { UsersEntity } from './users.entity';
+import { UsersEntity } from './entities/users.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
@@ -8,10 +8,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { ConfigService, ConfigModule } from '@nestjs/config';
+import { ProductRating } from 'src/ratings/entities/ratings_products.entity';
+import { ServiceRating } from 'src/ratings/entities/questionnaire_results.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersEntity]),
+    TypeOrmModule.forFeature([UsersEntity, ProductRating, ServiceRating]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

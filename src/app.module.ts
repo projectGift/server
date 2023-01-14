@@ -6,6 +6,7 @@ import { typeORMConfig } from './common/config/ormconfig';
 import { SuggestModule } from './suggest/suggest.module';
 import { DataImportModule } from './data-import/data-import.module';
 import { UsersModule } from './users/users.module';
+import { RatingsModule } from './ratings/ratings.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UsersModule } from './users/users.module';
     SuggestModule,
     DataImportModule,
     UsersModule,
+    RatingsModule,
   ],
   controllers: [],
   providers: [
