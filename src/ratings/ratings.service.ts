@@ -14,7 +14,19 @@ export class RatingsService {
   }
 
   async getAvgRating(productId) {
-    return this.ratingsRepository.getAvgRating(productId);
+    const listArr = await this.ratingsRepository.getProductRatings(productId);
+
+    const ratings = [];
+    listArr.forEach((el) => ratings.push(el.ratingId));
+
+    const average = ratings.reduce((a, c) => a + c) / ratings.length;
+
+    const result = {
+      productId,
+      average,
+    };
+
+    return result;
   }
 
   async addServiceRating(userId, questionnaireId, comment) {

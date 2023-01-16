@@ -24,7 +24,7 @@ export class RatingsRepository {
     return createdRating;
   }
 
-  async getProductRatings(productId, userId) {
+  async getProductRatings(productId?, userId?) {
     let result = this.productRatingRepository.find({
       where: {
         productId,
@@ -51,10 +51,6 @@ export class RatingsRepository {
     return result;
   }
 
-  async getAvgRating(proudctId) {
-    return 'hello';
-  }
-
   async addServiceRating(
     userId,
     questionnaireId,
@@ -66,7 +62,7 @@ export class RatingsRepository {
       comment,
     });
 
-    this.serviceRatingRepository.save(createdRating);
+    await this.serviceRatingRepository.save(createdRating);
     return createdRating;
   }
 
