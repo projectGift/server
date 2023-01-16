@@ -59,14 +59,26 @@ export class RatingsRepository {
     questionnaireId,
     comment,
   ): Promise<ServiceRating> {
+    if (questionnaireId.length) {
+      for (let i = 0; i < questionnaireId.length; i++) {
+        const createdRating = this.serviceRatingRepository.create({
+          userId,
+          questionnaireId: questionnaireId[i],
+          comment,
+        });
+
+        await this.serviceRatingRepository.save(createdRating);
+      }
+      return;
+    }
+
     const createdRating = this.serviceRatingRepository.create({
       userId,
       questionnaireId,
       comment,
     });
 
-    await this.serviceRatingRepository.save(createdRating);
-    return createdRating;
+    return await this.serviceRatingRepository.save(createdRating);
   }
 
   async getAllServiceQuestionnaire() {
@@ -76,9 +88,5 @@ export class RatingsRepository {
         assessment: true,
       },
     });
-  }
-
-  async getServiceQuestionnaire(userId, questionnaireId) {
-    return 'hello';
   }
 }

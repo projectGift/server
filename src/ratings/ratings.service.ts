@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { RatingsRepository } from './ratings.repository';
 
 @Injectable()
@@ -15,6 +15,12 @@ export class RatingsService {
 
   async getAvgRating(productId) {
     const listArr = await this.ratingsRepository.getProductRatings(productId);
+
+    if (listArr.length === 0) {
+      throw new NotFoundException(
+        `Can't find product ratings with id ${productId}`,
+      );
+    }
 
     const ratings = [];
     listArr.forEach((el) => ratings.push(el.ratingId));
@@ -39,12 +45,5 @@ export class RatingsService {
 
   async getAllServiceQuestionnaire() {
     return this.ratingsRepository.getAllServiceQuestionnaire();
-  }
-
-  async getServiceQuestionnaire(userId, questionnaireId) {
-    return this.ratingsRepository.getServiceQuestionnaire(
-      userId,
-      questionnaireId,
-    );
   }
 }
