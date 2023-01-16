@@ -1,5 +1,5 @@
 import { RequestUserDto } from './dto/users.request.dto';
-import { UsersEntity } from './users.entity';
+import { UsersEntity } from './entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   ConflictException,

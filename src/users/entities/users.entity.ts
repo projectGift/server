@@ -10,9 +10,12 @@ import {
   BaseEntity,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
+import { ProductRating } from 'src/ratings/entities/ratings_products.entity';
+import { ServiceRating } from 'src/ratings/entities/questionnaire_results.entity';
 
 @Entity({ name: 'users' })
 @Unique(['email'])
@@ -47,23 +50,21 @@ export class UsersEntity extends BaseEntity {
   @Column()
   password: string;
 
-  @Column({
-    nullable: true,
-  })
+  @Column({ nullable: true })
   phone: string;
 
-  @Column({
-    nullable: true,
-  })
-  profile_image_url: string;
+  @Column({ nullable: true })
+  profileImageUrl: string;
 
-  @Column({
-    nullable: true,
-  })
-  kakao_id: number;
+  @Column({ nullable: true })
+  kakaoId: number;
 
-  @Column({
-    nullable: true,
-  })
-  google_id: number;
+  @Column({ nullable: true })
+  googleId: number;
+
+  @OneToMany(() => ProductRating, (productRating) => productRating.user)
+  productRatings: ProductRating[];
+
+  @OneToMany(() => ServiceRating, (serviceRating) => serviceRating.user)
+  serviceRatings: ServiceRating[];
 }

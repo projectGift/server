@@ -20,7 +20,14 @@ import { ProductsPersonalityListsEntity } from 'src/data-import/entities/product
 import { ProductsRelationListsEntity } from 'src/data-import/entities/products_relation_lists.entity';
 import { ProductsSeasonListsEntity } from 'src/data-import/entities/products_season_lists.entity';
 import { ProductsTimeListsEntity } from 'src/data-import/entities/products_time_lists.entity';
-import { UsersEntity } from './../../users/users.entity';
+import { UsersEntity } from 'src/users/entities/users.entity';
+import { QuestionsEntity } from 'src/ratings/entities/questions.entity';
+import { AssessmentsEntity } from 'src/ratings/entities/assessments.entity';
+import { QuestionnaireEntity } from 'src/ratings/entities/questionnaire.entity';
+import { RatingsEntity } from 'src/ratings/entities/ratings_entity';
+import { ServiceRating } from 'src/ratings/entities/questionnaire_results.entity';
+import { ProductRating } from 'src/ratings/entities/ratings_products.entity';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 export const typeORMConfig: TypeOrmModuleAsyncOptions = {
   imports: [ConfigModule],
@@ -53,7 +60,14 @@ export const typeORMConfig: TypeOrmModuleAsyncOptions = {
       ProductsSeasonListsEntity,
       ProductsTimeListsEntity,
       UsersEntity,
+      QuestionsEntity,
+      AssessmentsEntity,
+      QuestionnaireEntity,
+      RatingsEntity,
+      ProductRating,
+      ServiceRating,
     ],
+    namingStrategy: new SnakeNamingStrategy(),
     synchronize: false,
   }),
   dataSourceFactory: async (options) => {
