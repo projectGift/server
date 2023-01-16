@@ -68,7 +68,7 @@ export const typeORMConfig: TypeOrmModuleAsyncOptions = {
       ServiceRating,
     ],
     namingStrategy: new SnakeNamingStrategy(),
-    synchronize: true,
+    synchronize: false,
   }),
   dataSourceFactory: async (options) => {
     const dataSource = await new DataSource(options).initialize();

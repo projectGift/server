@@ -24,6 +24,37 @@ export class RatingsRepository {
     return createdRating;
   }
 
+  async getProductRatings(productId, userId) {
+    let result = this.productRatingRepository.find({
+      where: {
+        productId,
+        userId,
+      },
+    });
+
+    if (!productId) {
+      result = this.productRatingRepository.find({
+        where: {
+          userId,
+        },
+      });
+    }
+
+    if (!userId) {
+      result = this.productRatingRepository.find({
+        where: {
+          productId,
+        },
+      });
+    }
+
+    return result;
+  }
+
+  async getAvgRating(proudctId) {
+    return 'hello';
+  }
+
   async addServiceRating(
     userId,
     questionnaireId,
@@ -37,5 +68,13 @@ export class RatingsRepository {
 
     this.serviceRatingRepository.save(createdRating);
     return createdRating;
+  }
+
+  async getAllServiceQuestionnaire() {
+    return 'hello';
+  }
+
+  async getServiceQuestionnaire(userId, questionnaireId) {
+    return 'hello';
   }
 }
