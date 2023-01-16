@@ -36,7 +36,8 @@ export class UsersService {
       throw new NotFoundException('No user');
     }
 
-    if (bcrypt.compare(password, user.password)) {
+    const match = await bcrypt.compare(password, user.password);
+    if (match) {
       const payload = { id: user.id };
       const accessToken = await this.jwtService.sign(payload);
 
