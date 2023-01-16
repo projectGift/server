@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { QuestionnaireEntity } from './entities/questionnaire.entity';
 import { ServiceRating } from './entities/questionnaire_results.entity';
 import { ProductRating } from './entities/ratings_products.entity';
 
@@ -11,6 +12,8 @@ export class RatingsRepository {
     private productRatingRepository: Repository<ProductRating>,
     @InjectRepository(ServiceRating)
     private serviceRatingRepository: Repository<ServiceRating>,
+    @InjectRepository(QuestionnaireEntity)
+    private questionnaireRepository: Repository<QuestionnaireEntity>,
   ) {}
 
   async addProductRating(userId, productId, ratingId): Promise<ProductRating> {
@@ -67,7 +70,12 @@ export class RatingsRepository {
   }
 
   async getAllServiceQuestionnaire() {
-    return 'hello';
+    return this.questionnaireRepository.find({
+      relations: {
+        question: true,
+        assessment: true,
+      },
+    });
   }
 
   async getServiceQuestionnaire(userId, questionnaireId) {
