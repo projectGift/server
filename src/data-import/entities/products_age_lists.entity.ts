@@ -3,7 +3,7 @@ import {
   Column,
   Entity,
   JoinTable,
-  ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { AgeListEntity } from './age_lists.entity';
@@ -18,7 +18,7 @@ export class ProductsAgeListsEntity extends BaseEntity {
   products_id: number;
 
   @Column()
-  @ManyToMany(() => AgeListEntity)
+  @ManyToOne(() => AgeListEntity, (age) => age.id)
   @JoinTable()
   age_lists_id: number;
 }

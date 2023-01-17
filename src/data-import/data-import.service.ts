@@ -171,7 +171,6 @@ export class DataImportService {
       const productSeasonListResultLength = productSeasonListResult.length;
       const productTimeListResultLength = productTimeListResult.length;
 
-      console.log(productsRows);
       if (genderResultLength > 0) {
         for (const row of rows) {
           if (row['gender'] != null) {
@@ -427,7 +426,6 @@ export class DataImportService {
 
           if (row['gender'] != null) {
             const arrayGenderList = row['gender'].split(',');
-
             await arrayGenderList.map((element) =>
               this.dataSource.query(
                 `UPDATE products_gender_lists SET gender_lists_id = ${element} WHERE products_id = ${productId[0].id} `,
@@ -563,7 +561,6 @@ export class DataImportService {
 
           if (row['mbti'] != null) {
             const arrayMbtiList = row['mbti'].split(',');
-
             await arrayMbtiList.map((element) =>
               this.dataSource.query(
                 `UPDATE products_mbti_lists SET mbti_lists_id = ${element} WHERE products_id = ${productId[0].id} `,
@@ -578,7 +575,6 @@ export class DataImportService {
           );
           if (row['mbti'] != null) {
             const arrayMbtiList = row['mbti'].split(',');
-
             await arrayMbtiList.map((element) =>
               this.dataSource.query(
                 `INSERT INTO products_mbti_lists (products_id, mbti_lists_id) VALUE (?, ?)`,
