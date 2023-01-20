@@ -37,6 +37,7 @@ export class SuggestService {
     const numberArray = Object.entries(labelingData).filter(
       (item) => typeof item[1] === 'number',
     );
+
     const multipleArray = Object.entries(labelingData).filter(
       (item) => typeof item[1] !== 'number',
     );
@@ -77,64 +78,138 @@ export class SuggestService {
       })
       .sort(([, a]: any, [, b]: any) => b - a);
 
-    let addProductId;
+    let reviewSortResult = [];
 
-    if (priceAndCountProductId.length < 3) {
-      const getProductIdByPrice = await this.dataSource.query(`
+    switch (priceAndCountProductId.length) {
+      case 0: {
+        const getProductIdByPrice = await this.dataSource.query(`
     SELECT id FROM products WHERE product_price BETWEEN ${
       price.start - 50000
     } AND ${price.end + 50000}
     `);
 
-      const minMaxProductId = getProductIdByPrice.map((item) => item['id']);
+        const minMaxProductId = getProductIdByPrice.map((item) => item['id']);
 
-      const sameIdCount = getProductIdFromLabeling.reduce(
-        (ac, v) => ({ ...ac, [v]: (ac[v] || 0) + 1 }),
-        {},
-      );
+        const sameIdCount = getProductIdFromLabeling.reduce(
+          (ac, v) => ({ ...ac, [v]: (ac[v] || 0) + 1 }),
+          {},
+        );
 
-      const getProductIdAndCounting = Object.entries(sameIdCount)
-        .filter((item) => {
-          for (let i = 0; i < minMaxProductId.length; i++) {
-            if (minMaxProductId[i] == item[0]) return item;
-          }
-        })
-        .sort(([, a]: any, [, b]: any) => b - a);
+        const getProductIdAndCounting = Object.entries(sameIdCount)
+          .filter((item) => {
+            for (let i = 0; i < minMaxProductId.length; i++) {
+              if (minMaxProductId[i] == item[0]) return item;
+            }
+          })
+          .sort(([, a]: any, [, b]: any) => b - a);
 
-      addProductId = getProductIdAndCounting
-        .filter(
-          (el) => !priceAndCountProductId.map((t) => t[0]).includes(el[0]),
-        )
-        .slice(0, 3 - priceAndCountProductId.length);
+        const addProductId = getProductIdAndCounting
+          .filter(
+            (el) => !priceAndCountProductId.map((t) => t[0]).includes(el[0]),
+          )
+          .slice(0, 3 - priceAndCountProductId.length);
+
+        const addProductInfo = await Promise.all(
+          addProductId.map(
+            async (item) =>
+              await this.dataSource.query(
+                `SELECT * FROM products WHERE id = ${item[0]}`,
+              ),
+          ),
+        );
+
+        const addResult = addProductInfo.reduce((acc, value) => [
+          ...acc,
+          ...value,
+        ]);
+
+        reviewSortResult = addResult
+          .sort((a, b) => b.product_review_count - a.product_review_count)
+          .splice(0, 3);
+
+        break;
+      }
+      case 1:
+      case 2: {
+        const getProductIdByPrice = await this.dataSource.query(`
+    SELECT id FROM products WHERE product_price BETWEEN ${
+      price.start - 50000
+    } AND ${price.end + 50000}
+    `);
+
+        const minMaxProductId = getProductIdByPrice.map((item) => item['id']);
+
+        const sameIdCount = getProductIdFromLabeling.reduce(
+          (ac, v) => ({ ...ac, [v]: (ac[v] || 0) + 1 }),
+          {},
+        );
+
+        const getProductIdAndCounting = Object.entries(sameIdCount)
+          .filter((item) => {
+            for (let i = 0; i < minMaxProductId.length; i++) {
+              if (minMaxProductId[i] == item[0]) return item;
+            }
+          })
+          .sort(([, a]: any, [, b]: any) => b - a);
+
+        const addProductId = getProductIdAndCounting
+          .filter(
+            (el) => !priceAndCountProductId.map((t) => t[0]).includes(el[0]),
+          )
+          .slice(0, 3 - priceAndCountProductId.length);
+
+        const addProductInfo = await Promise.all(
+          addProductId.map(
+            async (item) =>
+              await this.dataSource.query(
+                `SELECT * FROM products WHERE id = ${item[0]}`,
+              ),
+          ),
+        );
+
+        const result = await Promise.all(
+          priceAndCountProductId.map(
+            async (item) =>
+              await this.dataSource.query(
+                `SELECT * FROM products WHERE id = ${item[0]}`,
+              ),
+          ),
+        );
+
+        const sortResult = result.reduce((acc, value) => [...acc, ...value]);
+
+        const addResult = addProductInfo.reduce((acc, value) => [
+          ...acc,
+          ...value,
+        ]);
+
+        reviewSortResult = sortResult
+          .sort((a, b) => b.product_review_count - a.product_review_count)
+          .splice(0, 3);
+
+        reviewSortResult.push(...addResult);
+
+        break;
+      }
+      default: {
+        const result = await Promise.all(
+          priceAndCountProductId.map(
+            async (item) =>
+              await this.dataSource.query(
+                `SELECT * FROM products WHERE id = ${item[0]}`,
+              ),
+          ),
+        );
+
+        const sortResult = result.reduce((acc, value) => [...acc, ...value]);
+
+        reviewSortResult = sortResult
+          .sort((a, b) => b.product_review_count - a.product_review_count)
+          .splice(0, 3);
+
+        return reviewSortResult;
+      }
     }
-
-    const result = await Promise.all(
-      priceAndCountProductId.map(
-        async (item) =>
-          await this.dataSource.query(
-            `SELECT * FROM products WHERE id = ${item[0]}`,
-          ),
-      ),
-    );
-
-    const addProductInfo = await Promise.all(
-      addProductId.map(
-        async (item: string[]) =>
-          await this.dataSource.query(
-            `SELECT * FROM products WHERE id = ${item[0]}`,
-          ),
-      ),
-    );
-
-    const addResult = addProductInfo.reduce((acc, value) => [...acc, ...value]);
-
-    const sortResult = result.reduce((acc, value) => [...acc, ...value]);
-
-    const reviewSortResult = sortResult
-      .sort((a, b) => b.product_review_count - a.product_review_count)
-      .splice(0, 3);
-
-    reviewSortResult.push(...addResult);
 
     return reviewSortResult;
   }
