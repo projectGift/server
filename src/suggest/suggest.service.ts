@@ -213,4 +213,11 @@ export class SuggestService {
 
     return reviewSortResult;
   }
+
+  async getAllProductCounting() {
+    const allProductCounting = await this.dataSource.query(
+      `SELECT id FROM products`,
+    );
+    return allProductCounting.length;
+  }
 }

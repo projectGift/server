@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { SuggestDto } from './dto/suggest.dto';
 import { SuggestService } from './suggest.service';
 
@@ -9,5 +9,10 @@ export class SuggestController {
   @Post()
   async getSuggestProduct(@Body() body: SuggestDto) {
     return this.suggestService.getSuggestProduct(body);
+  }
+
+  @Get('/product-counting')
+  async getAllProductCounting() {
+    return this.suggestService.getAllProductCounting();
   }
 }
