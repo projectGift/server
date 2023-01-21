@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -15,5 +16,10 @@ export class DataImportController {
   @UseInterceptors(FileInterceptor('file'))
   importCsvDataInDatabase(@UploadedFile() file) {
     return this.dataImportService.importCsvDataInDatabase(file);
+  }
+
+  @Get()
+  getOgImage() {
+    return this.dataImportService.getOgImage();
   }
 }
