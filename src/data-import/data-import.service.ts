@@ -21,6 +21,7 @@ import { ProductsRelationListsEntity } from './entities/products_relation_lists.
 import { ProductsSeasonListsEntity } from './entities/products_season_lists.entity';
 import { ProductsTimeListsEntity } from './entities/products_time_lists.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as og from 'open-graph';
 
 @Injectable()
 export class DataImportService {
@@ -730,6 +731,20 @@ export class DataImportService {
       await queryRunner.release();
 
       console.error(error);
+    }
+  }
+
+  async getOgImage() {
+    const allProductIdAndUrl = await this.dataSource.query(
+      `SELECT id, product_url FROM products`,
+    );
+
+    for (let i = 0; i < allProductIdAndUrl.length; i++) {
+      og(allProductIdAndUrl[i].product_url, (err, meta) => {
+        this.dataSource.query(
+          `UPDATE products SET thumbnail = '${meta.image.url}' WHERE id = ${allProductIdAndUrl[i].id}`,
+        );
+      });
     }
   }
 }
