@@ -15,7 +15,7 @@ deploy:
     bucket: project-gift-s3
     region: ap-northeast-2
     skip_cleanup: true
-    acl: public_read
+    # acl: public_read
     wait-until-deployed: true
     on:
       repo: projectGift/server
