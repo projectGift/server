@@ -9,7 +9,7 @@ services:
 before_install: # 패키지를 다운로드 받기 전
   - docker build -t eunsongpark/test-app -f ./Dockerfile.dev ./
 script:
-  - docker run -e CI=true eunsongpark/project-gift-server npm run test # 현재 test 하지않고 빠져나오게 코드 작성
+  - docker run -e CI=true eunsongpark/test-app npm run test # 현재 test 하지않고 빠져나오게 코드 작성
 
 after_success:
   - docker build -t eunsongpark/project-gift-server ./
