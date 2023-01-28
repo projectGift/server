@@ -18,6 +18,11 @@ after_success:
 
   - docker push eunsongpark/project-gift-server
 
+before_deploy:
+  - zip -r project-gift
+  - mkdir -p deploy
+  - mv project-gift.zip deploy/project-gift.zip
+
 deploy:
   - provider: s3
     access_key_id: $AWS_ACCESS_KEY # Travis repo settings에 설정된 값
@@ -25,6 +30,21 @@ deploy:
     bucket: project-gift-s3
     region: ap-northeast-2
     skip_cleanup: true
+    local_dir: deploy
+    wait-until-deployed: true
+    on:
+      repo: projectGift/server
+      branch: feature/docker
+
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: project-gift-s3
+    key: project-gift.zip
+    bundle_type: zip
+    application: gift-deploy
+    deployment_group: gift
+    region: ap-northeast-2
     wait-until-deployed: true
     on:
       repo: projectGift/server
