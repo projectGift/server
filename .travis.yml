@@ -19,7 +19,7 @@ after_success:
   - docker push eunsongpark/project-gift-server
 
 before_deploy:
-  - zip -r project-gift
+  - zip -r project-gift *
   - mkdir -p deploy
   - mv project-gift.zip deploy/project-gift.zip
 
