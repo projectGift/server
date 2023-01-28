@@ -1,10 +1,5 @@
-# AWS Codedeploy 설정
 version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ubuntu/project-gift # S3에서 가지고 온 파일을 서버에 저장할 장소
-# hooks:
-#   AfterInstall: # 배포가 끝나면 실행
-#     - location: execute-deploy.sh
-#       timeout: 240
+    destination: /home/ubuntu/project-gift
