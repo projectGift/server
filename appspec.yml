@@ -3,3 +3,7 @@ os: linux
 files:
   - source: /
     destination: /home/ubuntu/project-gift
+# hooks:
+#   AfterInstall:
+#     - location: execute-deploy.sh
+#       timeout: 240

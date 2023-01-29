@@ -41,8 +41,8 @@ deploy:
     bucket: project-gift-s3
     key: project-gift.zip
     bundle_type: zip
-    application: gift-deploy
-    deployment_group: gift
+    application: gift-deploy-application
+    deployment_group: gift-deploy-group
     region: ap-northeast-2
     wait-until-deployed: true
     on:
