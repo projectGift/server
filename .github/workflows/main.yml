@@ -1,0 +1,22 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - feature/docker
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AWS_IP }}
+          username: ${{ secrets.AWS_ACCESS_KEY }}
+          key: ${{ secrets.AWS_SECRET_KEY }}
+          port: ${{ secrets.AWS_PORT }}
+          script: |
+            cd ~
+            mkdir test
