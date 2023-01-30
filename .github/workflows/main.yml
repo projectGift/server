@@ -8,7 +8,7 @@ on:
 
 # 환경설정
 env:
-  DOCKER_IMAGE: ghcr.io/eunsongpark/project-gift-server
+  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/project-gift-server
   VERSION: ${{ github.sha }}
   NAME: go_cicd
 
