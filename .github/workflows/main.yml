@@ -11,6 +11,8 @@ env:
   DOCKER_IMAGE: ghcr.io/${{ github.actor }}/project-gift-server
   VERSION: ${{ github.sha }}
   NAME: go_cicd # 컨테이너 이름??
+  EUNSONG: ${{ secrets.EUNSONG }}
+  HELLO: ${{ secrets.HELLO }}
 
 jobs:
   # 테스트 Job
