@@ -74,7 +74,7 @@ jobs:
       # 3000 -> 80 포트로 수행하도록 지정
       - name: Docker run
         run: |
-          docker stop ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
+          docker stop ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rm -f $(docker ps -aq --filter ancestor=${{ env.DOCKER_IMAGE }}) && docker rmi ${{ env.DOCKER_IMAGE }}:latest
           docker run -d -p 3000:3000 --name ${{ env.NAME }} --restart always ${{ env.DOCKER_IMAGE }}:latest
 
   # 프론트 배포방식
