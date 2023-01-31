@@ -10,15 +10,28 @@ on:
 env:
   DOCKER_IMAGE: ghcr.io/${{ github.actor }}/project-gift-server
   VERSION: ${{ github.sha }}
-  NAME: go_cicd
+  NAME: go_cicd # 컨테이너 이름??
 
 jobs:
+  # 테스트 Job
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      # github repository에서 checkout (코드 가져오기)
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: docker build -t nest-test-app -f ./Dockerfile.dev ./
+      - name: Run tests
+        run: docker run nest-test-app npm run test
+
   # 빌드 Job
   build:
+    needs: test # 테스트 후에 실행되도록 정의
     name: Build
     runs-on: ubuntu-latest
     steps:
-      # github repository에서 checkout
+      # github repository에서 checkout (코드 가져오기)
       - uses: actions/checkout@v2
       # docker build 수행
       - name: Set up docker buildx
@@ -45,36 +58,38 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:latest
+
   # 배포 Job
-  # deploy:
-  #   needs: build  # build 후에 실행되도록 정의
-  #   name: Deploy
-  #   runs-on: [ self-hosted, label-go ] # AWS ./configure에서 사용할 label명
-  #   steps:
-  #     - name: Login to ghcr
-  #       uses: docker/login-action@v1
-  #       with:
-  #         registry: ghcr.io
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GHCR_TOKEN }}
-  #     # 3000 -> 80 포트로 수행하도록 지정
-  #     - name: Docker run
-  #       run: |
-  #         docker stop ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
-  #         docker run -d -p 80:3000 --name go_cicd --restart always ${{ env.DOCKER_IMAGE }}:latest
-  # 프론트 배포방식
   deploy:
-    needs: build
+    needs: build # build 후에 실행되도록 정의
     name: Deploy
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, label-go] # AWS ./configure에서 사용할 label명
     steps:
-      - name: Get control for ec2 deploy
-        uses: appleboy/ssh-action@master
+      - name: Login to ghcr
+        uses: docker/login-action@v1
         with:
-          host: ${{ secrets.AWS_IP }}
-          username: ${{ secrets.AWS_SSH_USERNAME }}
-          key: ${{ secrets.AWS_SSH_KEY }}
-          port: ${{ secrets.AWS_PORT }}
-          script: |
-            cd ~
-            mkdir test
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+      # 3000 -> 80 포트로 수행하도록 지정
+      - name: Docker run
+        run: |
+          docker stop ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
+          docker run -d -p 80:3001 --name ${{ env.NAME }} --restart always ${{ env.DOCKER_IMAGE }}:latest
+
+  # 프론트 배포방식
+  # deploy:
+  #   needs: build
+  #   name: Deploy
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Get control for ec2 deploy
+  #       uses: appleboy/ssh-action@master
+  #       with:
+  #         host: ${{ secrets.AWS_IP }}
+  #         username: ${{ secrets.AWS_SSH_USERNAME }}
+  #         key: ${{ secrets.AWS_SSH_KEY }}
+  #         port: ${{ secrets.AWS_PORT }}
+  #         script: |
+  #           cd ~
+  #           mkdir test
