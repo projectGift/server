@@ -11,8 +11,6 @@ env:
   DOCKER_IMAGE: ghcr.io/${{ github.actor }}/project-gift-server
   VERSION: ${{ github.sha }}
   NAME: go_cicd # 컨테이너 이름??
-  EUNSONG: ${{ secrets.EUNSONG }}
-  HELLO: ${{ secrets.HELLO }}
 
 jobs:
   # 테스트 Job
@@ -60,6 +58,16 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:latest
+          secrets: |
+            "PORT=${{ secrets.PORT }}"
+            "DB_URL=${{ secrets.DB_URL }}"
+            "DB_USERNAME=${{ secrets.DB_USERNAME }}"
+            "DB_PASSWORD=${{ secrets.DB_PASSWORD }}"
+            "DB_HOST=${{ secrets.DB_HOST }}"
+            "DB_NAME=${{ secrets.DB_NAME }}"
+            "DB_PORT=${{ secrets.DB_PORT }}"
+            "JWT_SECRET=${{ secrets.JWT_SECRET }}"
+            "JWT_EXPIRESIN=${{ secrets.JWT_EXPIRESIN }}"
 
   # 배포 Job
   deploy:
