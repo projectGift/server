@@ -1,5 +1,7 @@
 FROM node:18
 WORKDIR /usr/src/app
+
+# 종속성 먼저 다운로드 받아서 소스코드 일부만 변경된 것으로 불필요하게 모듈을 다시 다운로드받지 않게 하기
 COPY package.json ./
 RUN npm install
 
@@ -8,6 +10,8 @@ RUN npm install -g pm2
 
 COPY ./ ./
 RUN npm run build
+
+# 컨테이너의 3000번 포트 열기
 EXPOSE 3000
 
 # github actions에서 끌어온 환경변수를 docker container 내에서 저장
@@ -31,4 +35,5 @@ RUN --mount=type=secret,id=PORT \
   export JWT_EXPIRESIN=$(cat /run/secrets/JWT_EXPIRESIN) && \
   printenv > .env
 
+# pm2를 docker 컨테이너에서 돌리기 위해서는 pm2-runtime으로 실행
 CMD [ "pm2-runtime", "start", "dist/main.js" ]

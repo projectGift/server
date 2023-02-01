@@ -16,7 +16,7 @@ services:
   #     - backend
 
   backend:
-    image: eunsongpark/project-gift-server
+    image: ghcr.io/smileeunsong/project-gift-server
     # build:
     #   dockerfile: Dockerfile.dev
     #   context: ./backend

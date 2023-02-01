@@ -19,6 +19,7 @@ lerna-debug.log*
 # Tests
 /coverage
 /.nyc_output
+.travis.yml
 
 # IDEs and editors
 /.idea
