@@ -1,0 +1,87 @@
+name: CI/CD
+
+# 트리거를 수행할 브랜치 지정
+on:
+  push:
+    branches: [main]
+
+# 환경설정
+env:
+  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/project-gift-server
+  VERSION: ${{ github.sha }}
+  NAME: go_cicd # 컨테이너 이름
+
+jobs:
+  # 테스트 Job
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      # github repository에서 checkout (코드 가져오기)
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: docker build -t nest-test-app -f ./Dockerfile.dev ./
+      - name: Run tests
+        run: docker run nest-test-app npm run test
+
+  # 빌드 Job
+  build:
+    needs: test # 테스트 후에 실행되도록 정의
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      # github repository에서 checkout (코드 가져오기)
+      - uses: actions/checkout@v2
+      # docker build 수행
+      - name: Set up docker buildx # 여러 다른 실행환경에서 호환 사용할 수 있도록 빌드
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Cache docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ env.VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      # GitHub 컨테이너 레지스트리에 로그인 후 빌드 & 푸시
+      - name: Login to ghcr
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          tags: ${{ env.DOCKER_IMAGE }}:latest
+          secrets: |
+            "PORT=${{ secrets.PORT }}"
+            "DB_URL=${{ secrets.DB_URL }}"
+            "DB_USERNAME=${{ secrets.DB_USERNAME }}"
+            "DB_PASSWORD=${{ secrets.DB_PASSWORD }}"
+            "DB_HOST=${{ secrets.DB_HOST }}"
+            "DB_NAME=${{ secrets.DB_NAME }}"
+            "DB_PORT=${{ secrets.DB_PORT }}"
+            "JWT_SECRET=${{ secrets.JWT_SECRET }}"
+            "JWT_EXPIRESIN=${{ secrets.JWT_EXPIRESIN }}"
+
+  # 배포 Job
+  deploy:
+    needs: build # build 후에 실행되도록 정의
+    name: Deploy
+    runs-on: [self-hosted, label-go] # AWS ./configure에서 사용할 label명
+    steps:
+      - name: Login to ghcr
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+      # host 80번 포트로 유입되는 트래픽을 도커 컨테이너의 3000번 포트로 전달
+      - name: Docker run
+        run: |
+          docker stop ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi -f ${{ env.DOCKER_IMAGE }}:latest
+          docker run -d -p 80:3000 --name ${{ env.NAME }} --restart always ${{ env.DOCKER_IMAGE }}:latest
