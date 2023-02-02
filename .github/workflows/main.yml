@@ -3,8 +3,9 @@ name: CI/CD
 # 트리거를 수행할 브랜치 지정
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 # 환경설정
 env:
