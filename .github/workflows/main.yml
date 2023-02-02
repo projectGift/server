@@ -4,13 +4,13 @@ name: CI/CD
 on:
   push:
     branches:
-      - feature/docker
+      - main
 
 # 환경설정
 env:
   DOCKER_IMAGE: ghcr.io/${{ github.actor }}/project-gift-server
   VERSION: ${{ github.sha }}
-  NAME: go_cicd # 컨테이너 이름??
+  NAME: go_cicd # 컨테이너 이름
 
 jobs:
   # 테스트 Job

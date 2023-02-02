@@ -3,7 +3,7 @@ version: '3'
 services:
   # nginx:
   #   restart: always
-  #   image: eunsongpark/docker-nginx
+  #   image: ghcr.io/smileeunsong/project-gift-nginx
   #   # build:
   #   #   dockerfile: Dockerfile
   #   #   context: ./nginx
