@@ -7,7 +7,7 @@ on:
 
 # 환경설정
 env:
-  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/project-gift-server
+  DOCKER_IMAGE: ghcr.io/smileeunsong/project-gift-server
   VERSION: ${{ github.sha }}
   NAME: go_cicd # 컨테이너 이름
 
@@ -48,7 +48,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: smileeunsong
           password: ${{ secrets.GHCR_TOKEN }}
       - name: Build and push
         id: docker_build
@@ -78,7 +78,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: smileeunsong
           password: ${{ secrets.GHCR_TOKEN }}
       # host 80번 포트로 유입되는 트래픽을 도커 컨테이너의 3000번 포트로 전달
       - name: Docker run
