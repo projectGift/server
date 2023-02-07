@@ -123,9 +123,7 @@ export class SuggestService {
           ...value,
         ]);
 
-        reviewSortResult = addResult
-          .sort((a, b) => b.product_review_count - a.product_review_count)
-          .splice(0, 3);
+        reviewSortResult = addResult.splice(0, 3);
 
         break;
       }
@@ -183,11 +181,9 @@ export class SuggestService {
           ...value,
         ]);
 
-        reviewSortResult = sortResult
-          .sort((a, b) => b.product_review_count - a.product_review_count)
-          .splice(0, 3);
-
         reviewSortResult.push(...addResult);
+
+        reviewSortResult = sortResult.splice(0, 3);
 
         break;
       }
@@ -203,11 +199,20 @@ export class SuggestService {
 
         const sortResult = result.reduce((acc, value) => [...acc, ...value]);
 
-        reviewSortResult = sortResult
-          .sort((a, b) => b.product_review_count - a.product_review_count)
-          .splice(0, 3);
+        const suggestMinLength = Math.ceil(0);
+        const suggestMaxLength = Math.floor(sortResult.length);
 
-        return reviewSortResult;
+        const randomProductResult = [];
+
+        for (let i = 0; i < 3; i++) {
+          const randomInteger =
+            Math.floor(
+              Math.random() * (suggestMaxLength - suggestMinLength + 1),
+            ) + suggestMinLength;
+          randomProductResult.push(sortResult[randomInteger]);
+        }
+
+        return randomProductResult;
       }
     }
 
