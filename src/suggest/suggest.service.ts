@@ -181,9 +181,9 @@ export class SuggestService {
           ...value,
         ]);
 
-        reviewSortResult = sortResult.splice(0, 3);
-
         reviewSortResult.push(...addResult);
+
+        reviewSortResult = sortResult.splice(0, 3);
 
         break;
       }
