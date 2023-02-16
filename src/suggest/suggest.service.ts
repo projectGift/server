@@ -5,66 +5,136 @@ import { SuggestDto } from './dto/suggest.dto';
 @Injectable()
 export class SuggestService {
   constructor(private readonly dataSource: DataSource) {}
-  async getSuggestProduct(body: SuggestDto) {
-    const {
-      gender,
-      age,
-      mbti,
-      personality,
-      price,
-      relation,
-      time,
-      hobby,
-      season,
-      event,
-      receiver,
-    } = body;
 
+  async getSuggestProduct(body: SuggestDto) {
     const labelingData = {
-      gender,
-      age,
-      mbti,
-      personality,
-      relation,
-      time,
-      hobby,
-      season,
-      event,
+      gender: body.gender,
+      age: body.age,
+      mbti: body.mbti,
+      personality: body.personality,
+      relation: body.relation,
+      time: body.time,
+      hobby: body.hobby,
+      season: body.season,
+      event: body.event,
     };
 
-    const getProductIdFromLabeling = [];
+    const priceSortProductId = await this.dataSource.query(`
+      SELECT id FROM products WHERE product_price BETWEEN ${body.price.start} AND ${body.price.end}
+    `);
 
-    const numberArray = Object.entries(labelingData).filter(
+    let productId = Object.values(priceSortProductId).map((item) => item['id']);
+
+    const getTableNameRabeling = Object.entries(labelingData).filter(
       (item) => typeof item[1] === 'number',
     );
 
-    const multipleArray = Object.entries(labelingData).filter(
+    const getMultiLabeling = Object.entries(labelingData).filter(
       (item) => typeof item[1] !== 'number',
     );
 
-    multipleArray.map((key: any[]) =>
-      key[1].map((value: number[]) => numberArray.push([key[0], value])),
+    getMultiLabeling.map((key: any[]) =>
+      key[1].map((item) => getTableNameRabeling.push([key[0], item])),
     );
 
-    // console.log(numberArray[0][1]);
-    for (let i = 0; i < numberArray.length; i++) {
+    // 크리티컬하다고 생각되는 부분은 미리 상품군에서 제외하는 로직
+    for (const x of getTableNameRabeling) {
+      // 둘 다를 선택하면 상관없는 것이기 때문에 전체 상품이 나와야하기 때문에 라벨링을 전체 다 달아줬음
+      // 남자를 선택하면 남자가 포함된 상품만 나와야한다 (여자 라벨링 되어있는 상품 제외)
+      // 여자를 선택하면 여자가 포함된 상품만 나와야한다 (남자 라벨링 되어있는 상품 제외)
+      if (x[0] === 'gender') {
+        const listData = await this.dataSource.query(`
+      SELECT products_id FROM products_${x[0]}_lists WHERE ${x[0]}_lists_id = ${x[1]}
+      `);
+
+        const productIdList: number[] = listData.map(
+          (item) => item['products_id'],
+        );
+
+        const filtering = productIdList.filter(
+          (item) => productId.indexOf(item) !== -1,
+        );
+
+        productId = filtering;
+      }
+
+      // age에서 반려동물이 나왔을 때는 반려동물 상품만 남기고 나머지를 다 자른다
+      if (x[0] === 'age' && x[1] === 2) {
+        const listData = await this.dataSource.query(`
+      SELECT products_id FROM products_${x[0]}_lists WHERE ${x[0]}_lists_id = ${x[1]}
+      `);
+
+        const productIdList: number[] = listData.map(
+          (item) => item['products_id'],
+        );
+
+        const filtering = productIdList.filter(
+          (item) => productId.indexOf(item) !== -1,
+        );
+
+        productId = filtering;
+      }
+
+      // age에서 아기가 나왔을 때는 아기 상품만 남기고 나머지를 다 자른다
+      if (x[0] === 'age' && x[1] === 3) {
+        const listData = await this.dataSource.query(`
+      SELECT products_id FROM products_${x[0]}_lists WHERE ${x[0]}_lists_id = ${x[1]}
+      `);
+
+        const productIdList: number[] = listData.map(
+          (item) => item['products_id'],
+        );
+
+        const filtering = productIdList.filter(
+          (item) => productId.indexOf(item) !== -1,
+        );
+
+        if (filtering.length > 3) {
+          productId = filtering;
+        }
+        // filtering 데이터가 3개가 안 될 경우 가격범위를 넓혀서 새로운 상품군을 만든다.
+        if (filtering.length < 3) {
+          const priceSortProductId = await this.dataSource.query(`
+      SELECT id FROM products WHERE product_price BETWEEN ${
+        body.price.start - 50000
+      } AND ${body.price.end + 50000}
+    `);
+
+          const addPriceProductId = Object.values(priceSortProductId).map(
+            (item) => item['id'],
+          );
+
+          const listData = await this.dataSource.query(`
+    SELECT products_id FROM products_${x[0]}_lists WHERE ${x[0]}_lists_id = ${x[1]}
+    `);
+
+          const productIdList: number[] = listData.map(
+            (item) => item['products_id'],
+          );
+
+          const filtering = productIdList.filter(
+            (item) => addPriceProductId.indexOf(item) !== -1,
+          );
+
+          productId = filtering;
+        }
+      }
+    }
+
+    const getProductIdFromLabeling = [];
+
+    for (let i = 0; i < getTableNameRabeling.length; i++) {
       const getDataBaseData: [] = await this.dataSource.query(`
         SELECT 
         products_id
-        FROM products_${numberArray[i][0]}_lists
-        WHERE ${numberArray[i][0]}_lists_id = ${numberArray[i][1]}
+        FROM products_${getTableNameRabeling[i][0]}_lists
+        WHERE ${getTableNameRabeling[i][0]}_lists_id = ${getTableNameRabeling[i][1]}
       `);
 
       const getRows = getDataBaseData.map((item) => item['products_id']);
 
       getProductIdFromLabeling.push(...getRows);
     }
-
-    const getProductIdByPrice = await this.dataSource.query(`
-    SELECT id FROM products WHERE product_price BETWEEN ${price.start} AND ${price.end}
-    `);
-
-    const minMaxProductId = getProductIdByPrice.map((item: []) => item['id']);
 
     const sameIdCount = getProductIdFromLabeling.reduce(
       (ac, v) => ({ ...ac, [v]: (ac[v] || 0) + 1 }),
@@ -73,151 +143,63 @@ export class SuggestService {
 
     const priceAndCountProductId = Object.entries(sameIdCount)
       .filter((item) => {
-        for (let i = 0; i < minMaxProductId.length; i++) {
-          if (minMaxProductId[i] == item[0]) return item;
+        for (let i = 0; i < productId.length; i++) {
+          if (productId[i] == item[0]) return item;
         }
       })
       .sort(([, a]: any, [, b]: any) => b - a);
 
-    let reviewSortResult = [];
+    const mostSimilarProducts = [];
 
-    switch (priceAndCountProductId.length) {
-      case 0: {
-        const getProductIdByPrice = await this.dataSource.query(`
-    SELECT id FROM products WHERE product_price BETWEEN ${
-      price.start - 50000
-    } AND ${price.end + 50000}
-    `);
+    // 두 번만 돌리고 끝내고 싶어서 for문 밖에서 count를 2로 선언해줌
+    let count = 2;
 
-        const minMaxProductId = getProductIdByPrice.map((item) => item['id']);
+    // 현재 요소와 다음 요소를 비교했을 때, false를 반환한 시점에서 잘라서 외부의 배열에 push
+    // 해당 로직을 2번 반복하여 1,2번째로 많이 카운팅 된 상품군 반환 가능
+    for (let i = 0; i < priceAndCountProductId.length - 1; i++) {
+      if (count === 0) break;
 
-        const sameIdCount = getProductIdFromLabeling.reduce(
-          (ac, v) => ({ ...ac, [v]: (ac[v] || 0) + 1 }),
-          {},
-        );
-
-        const getProductIdAndCounting = Object.entries(sameIdCount)
-          .filter((item) => {
-            for (let i = 0; i < minMaxProductId.length; i++) {
-              if (minMaxProductId[i] == item[0]) return item;
-            }
-          })
-          .sort(([, a]: any, [, b]: any) => b - a);
-
-        const addProductId = getProductIdAndCounting
-          .filter(
-            (el) => !priceAndCountProductId.map((t) => t[0]).includes(el[0]),
-          )
-          .slice(0, 3 - priceAndCountProductId.length);
-
-        const addProductInfo = await Promise.all(
-          addProductId.map(
-            async (item) =>
-              await this.dataSource.query(
-                `SELECT * FROM products WHERE id = ${item[0]}`,
-              ),
-          ),
-        );
-
-        const addResult = addProductInfo.reduce((acc, value) => [
-          ...acc,
-          ...value,
-        ]);
-
-        reviewSortResult = addResult.splice(0, 3);
-
-        break;
-      }
-      case 1:
-      case 2: {
-        const getProductIdByPrice = await this.dataSource.query(`
-    SELECT id FROM products WHERE product_price BETWEEN ${
-      price.start - 50000
-    } AND ${price.end + 50000}
-    `);
-
-        const minMaxProductId = getProductIdByPrice.map((item) => item['id']);
-
-        const sameIdCount = getProductIdFromLabeling.reduce(
-          (ac, v) => ({ ...ac, [v]: (ac[v] || 0) + 1 }),
-          {},
-        );
-
-        const getProductIdAndCounting = Object.entries(sameIdCount)
-          .filter((item) => {
-            for (let i = 0; i < minMaxProductId.length; i++) {
-              if (minMaxProductId[i] == item[0]) return item;
-            }
-          })
-          .sort(([, a]: any, [, b]: any) => b - a);
-
-        const addProductId = getProductIdAndCounting
-          .filter(
-            (el) => !priceAndCountProductId.map((t) => t[0]).includes(el[0]),
-          )
-          .slice(0, 3 - priceAndCountProductId.length);
-
-        const addProductInfo = await Promise.all(
-          addProductId.map(
-            async (item) =>
-              await this.dataSource.query(
-                `SELECT * FROM products WHERE id = ${item[0]}`,
-              ),
-          ),
-        );
-
-        const result = await Promise.all(
-          priceAndCountProductId.map(
-            async (item) =>
-              await this.dataSource.query(
-                `SELECT * FROM products WHERE id = ${item[0]}`,
-              ),
-          ),
-        );
-
-        const sortResult = result.reduce((acc, value) => [...acc, ...value]);
-
-        const addResult = addProductInfo.reduce((acc, value) => [
-          ...acc,
-          ...value,
-        ]);
-
-        reviewSortResult.push(...addResult);
-
-        reviewSortResult = sortResult.splice(0, 3);
-
-        break;
-      }
-      default: {
-        const result = await Promise.all(
-          priceAndCountProductId.map(
-            async (item) =>
-              await this.dataSource.query(
-                `SELECT * FROM products WHERE id = ${item[0]}`,
-              ),
-          ),
-        );
-
-        const sortResult = result.reduce((acc, value) => [...acc, ...value]);
-
-        const suggestMinLength = Math.ceil(0);
-        const suggestMaxLength = Math.floor(sortResult.length);
-
-        const randomProductResult = [];
-
-        for (let i = 0; i < 3; i++) {
-          const randomInteger =
-            Math.floor(
-              Math.random() * (suggestMaxLength - suggestMinLength + 1),
-            ) + suggestMinLength;
-          randomProductResult.push(sortResult[randomInteger]);
-        }
-
-        return randomProductResult;
+      if (priceAndCountProductId[i][1] !== priceAndCountProductId[i + 1][1]) {
+        const cut = priceAndCountProductId.splice(0, i + 1);
+        mostSimilarProducts.push(...cut);
+        count -= 1;
       }
     }
 
-    return reviewSortResult;
+    // 반환 받은 상품군들의 정보를 query를 날려서 받는다
+    const getProductInfo = await Promise.all(
+      mostSimilarProducts.map(
+        async (item) =>
+          await this.dataSource.query(`
+      SELECT * FROM products WHERE id = ${item[0]}
+    `),
+      ),
+    );
+
+    // 이중배열 해제
+    const reviewSortProductInfo = getProductInfo.reduce((acc, value) => [
+      ...acc,
+      ...value,
+    ]);
+
+    // 반환받은 상품들의 길이에 맞게 랜덤한 값 산출
+    const suggestMinLength = Math.ceil(0);
+    const suggestMaxLength = Math.floor(reviewSortProductInfo.length) - 1;
+
+    const randomProductResult = [];
+
+    // 랜덤하게 결과값에 push
+    for (let i = 0; i < 3; i++) {
+      const randomInteger =
+        Math.floor(Math.random() * (suggestMaxLength - suggestMinLength + 1)) +
+        suggestMinLength;
+      randomProductResult.push(reviewSortProductInfo[randomInteger]);
+    }
+
+    // 반복문을 3번 돌렸기 때문에 3개의 상품이 들어와있고, 그 상품들을 review순으로 돌려서 1,2,3순위를 결정하여 반환
+    return randomProductResult.sort(
+      (a, b) => b.product_review_count - a.product_review_count,
+    );
   }
 
   async getAllProductCounting() {
