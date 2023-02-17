@@ -52,6 +52,7 @@ export class DataImportService {
         rowData
           .filter((item) => !getLabelingId.includes(item))
           .map(async (item) => {
+            console.log(getProductId[0].id, item);
             await this.dataSource.query(
               `
   INSERT INTO products_${column}_lists 
