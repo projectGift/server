@@ -46,6 +46,7 @@ export class SuggestService {
       key[1].map((value: number[]) => numberArray.push([key[0], value])),
     );
 
+    // console.log(numberArray[0][1]);
     for (let i = 0; i < numberArray.length; i++) {
       const getDataBaseData: [] = await this.dataSource.query(`
         SELECT 

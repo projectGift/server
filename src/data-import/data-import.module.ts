@@ -21,6 +21,7 @@ import { ProductsPersonalityListsEntity } from './entities/products_personality.
 import { ProductsRelationListsEntity } from './entities/products_relation_lists.entity';
 import { ProductsSeasonListsEntity } from './entities/products_season_lists.entity';
 import { ProductsTimeListsEntity } from './entities/products_time_lists.entity';
+import { Test } from './util';
 
 @Module({
   imports: [
@@ -44,9 +45,10 @@ import { ProductsTimeListsEntity } from './entities/products_time_lists.entity';
       ProductsRelationListsEntity,
       ProductsSeasonListsEntity,
       ProductsTimeListsEntity,
+      // Test,
     ]),
   ],
-  providers: [DataImportService],
+  providers: [DataImportService, Test],
   controllers: [DataImportController],
 })
 export class DataImportModule {}
