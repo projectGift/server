@@ -4,6 +4,8 @@ name: CI/CD
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**/README.md'
 
 # 환경설정
 env:
