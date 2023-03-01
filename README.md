@@ -210,14 +210,18 @@ https://solrasido55.shop
 └── tsconfig.json
 ```
 <br>
+<br>
 
 ### CI/CD 구조
 ![](https://blog.kakaocdn.net/dn/88NOt/btrX8jAjxXZ/heTRN7fxgXMGG1zLWPjui0/img.png)
+<br>
 <br>
 
 ### ERD
 
 ![Project_Gift](https://user-images.githubusercontent.com/111448985/222057293-4b447744-337b-412d-9d6a-fb78a59e3bd3.png)
+<br>
+<br>
 <br>
 
 
